@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-FROM jenkins/jnlp-slave:latest as build
+FROM jenkins/jnlp-slave:3.40-1-jdk11 as build
 
 FROM ubuntu:14.04.5
 
@@ -103,18 +103,13 @@ VOLUME /var/lib/docker
 
 COPY dockerd-entrypoint.sh /usr/local/bin/
 
-ENV JAVA_VERSION=8 \
-    JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64" \
-    JDK_HOME="/usr/lib/jvm/java-8-openjdk-amd64" \
-    JRE_HOME="/usr/lib/jvm/java-8-openjdk-amd64" \
-    ANT_VERSION=1.10.3 \
+ENV ANT_VERSION=1.10.3 \
     MAVEN_HOME="/opt/maven" \
     MAVEN_VERSION=3.5.4 \
     MAVEN_CONFIG="/root/.m2" \
     GRADLE_VERSION=4.2.1 \
     PROPERTIES_COMMON_VERSION=0.92.37.8 \
     PYTHON_TOOL_VERSION="3.3-*" \
-    JDK_VERSION="8u171-b11-2~14.04" \
     ANT_DOWNLOAD_SHA512="73f2193700b1d1e32eedf25fab1009e2a98fb2f6425413f5c9fa1b0f2f9f49f59cb8ed3f04931c808ae022a64ecfa2619e5fb77643fea6dbc29721e489eb3a07" \
     MAVEN_DOWNLOAD_SHA1="22cac91b3557586bb1eba326f2f7727543ff15e3" \
     GRADLE_DOWNLOAD_SHA256="b551cc04f2ca51c78dd14edb060621f0e5439bdfafa6fd167032a09ac708fbc0"
@@ -122,16 +117,8 @@ ENV JAVA_VERSION=8 \
 RUN set -ex \
     && apt-get update \
     && apt-get install -y software-properties-common=$PROPERTIES_COMMON_VERSION \
-    && add-apt-repository ppa:openjdk-r/ppa \
     && apt-get update \
     && apt-get install -y python-setuptools=$PYTHON_TOOL_VERSION \
-
-    # Install OpenJDK 8
-    && apt-get install -y openjdk-${JAVA_VERSION}-jdk=$JDK_VERSION \
-    && apt-get install -y --no-install-recommends ca-certificates-java \
-    && apt-get clean \
-    # Ensure Java cacerts symlink points to valid location
-    && update-ca-certificates -f \
 
     # Install Ant
     && curl -LSso /var/tmp/apache-ant-$ANT_VERSION-bin.tar.gz https://archive.apache.org/dist/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz  \
